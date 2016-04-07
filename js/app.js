@@ -1,4 +1,5 @@
-function timeConverter(UNIX_timestamp){
+function timeConverter(UNIX_timestamp) // Converts UNIX time to readable Date/Time
+{
   var a = new Date(UNIX_timestamp * 1000);
   var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   var year = a.getFullYear();
@@ -10,12 +11,8 @@ function timeConverter(UNIX_timestamp){
   var time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec ;
   return time;
 }
-var Base64 = {
-
-
+var Base64 = { // Base64 Conversion for Authorization Header
     _keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
-
-
     encode: function(input) {
         var output = "";
         var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
@@ -143,28 +140,6 @@ var Base64 = {
 }
     
     
-    
-
-
-
-function delRequest($http, $scope, id)
-{
-	var authdata=Base64.encode('admin:123456');
-	$http.defaults.headers.common['Authorization'] = 'Basic ' + authdata;
-	$http({
-	  method: 'DELETE',
-	  url: 'http://localhost:5000/api/v1/requests/'+id
-	}).then(function successCallback(response) {
-	    // this callback will be called asynchronously
-	    // when the response is available
-	    console.log(response)
-	  }, function errorCallback(response) {
-	  	alert("ERRORS!");
-	    // called asynchronously if an error occurs
-	    // or server returns response with an error status.
-	  });
-
-}
 
 /**************************/
 
@@ -199,7 +174,7 @@ app.config(function($routeProvider) {
 
 app.controller('mainController', function($scope, $http, $window)
 {
-	$scope.showloginform=function()
+	$scope.showloginform=function() // shows login form
 	{
 		var loginMessage=document.getElementById("loggedin").getElementsByClassName("user").item(0);
 		if(loginMessage.innerHTML.length>13)
@@ -210,7 +185,7 @@ app.controller('mainController', function($scope, $http, $window)
 			});
 		}
 	}
-	$scope.hideloginform=function(username) {
+	$scope.hideloginform=function(username) { // hide login form
 		var loginMessage=document.getElementById("loggedin").getElementsByClassName("user").item(0);
 		if(loginMessage.innerHTML.length<=13)
 		{
@@ -220,7 +195,7 @@ app.controller('mainController', function($scope, $http, $window)
 		});
 		}
 	}
-	$scope.login=function (user)
+	$scope.login=function (user) // Logs in user - collecting and storing token
 	{
 		$http({
 	  	method: 'GET',
@@ -234,12 +209,10 @@ app.controller('mainController', function($scope, $http, $window)
 	    $window.location.href = '/';
 	  	}, function errorCallback(response) {
 	  	alert("ERRORS!");
-	    // called asynchronously if an error occurs
-	    // or server returns response with an error status.
 	  });
 	};
 	
-	if(window.localStorage && window.localStorage.getItem('user')!==null)
+	if(window.localStorage && window.localStorage.getItem('user')!==null) // Check if Current User is logged in and show/hide form
 	{
 		$scope.hideloginform(JSON.parse(window.localStorage.getItem('user')).username);
 	}
@@ -247,7 +220,7 @@ app.controller('mainController', function($scope, $http, $window)
 	{
 		$scope.showloginform();
 	}
-	$scope.logout=function ()
+	$scope.logout=function () // Logs out user - Deletes token from storage as well as server
 	{
 		$scope.showloginform();
 		$http({
@@ -255,12 +228,9 @@ app.controller('mainController', function($scope, $http, $window)
 	  	headers: {'Content-type':'application/json', 'Authorization':'Basic '+Base64.encode(JSON.parse(localStorage.getItem("user")).token+':""')},
 	  	url: 'http://localhost:5000/logout'
 		}).then(function successCallback(response) {
-		    console.log(response);
 		    window.localStorage.removeItem('user');
 	  	}, function errorCallback(response) {
 	  		window.localStorage.removeItem('user');
-	    // called asynchronously if an error occurs
-	    // or server returns response with an error status.
 	  });
 	};
 });
@@ -270,7 +240,7 @@ app.controller('requestController', function($scope, $http, $routeParams, $windo
 	$scope.master = {};
 	$scope.message='request';
 	$scope.timeConverter=timeConverter;
-	$scope.del=function (item)
+	$scope.del=function (item) // Deletes a Request
 	{
 		$http({
 		method: 'DELETE',
@@ -285,7 +255,7 @@ app.controller('requestController', function($scope, $http, $routeParams, $windo
 		  });
 
 	};
-	$scope.getCoordinates=function(item)
+	$scope.getCoordinates=function(item) // Converts a given location to Longitude/Latitude using Google Maps API
 	{
 		if(item.location_string!=undefined&&item.location_string!="")
 		$http({
@@ -302,30 +272,26 @@ app.controller('requestController', function($scope, $http, $routeParams, $windo
 		  });
 	}
 
-	$scope.add=function (item)
+	$scope.add=function (item) // Function adds a new Request
 	{
 		$http({
 	  	method: 'POST',
 	  	url: 'http://localhost:5000/api/v1/requests',
 	 	data: '{"location_string":"'+item.location_string+'","meal_type":"'+item.meal_type+'","meal_time":"'+item.meal_time+'", "longitude":"'+item.longitude+'", "latitude":"'+item.latitude+'", "user_id":"'+JSON.parse(window.localStorage.getItem('user')).id+'"}',
-	  	// data: '{"location":"'+item.location_string+'","meal_type":"'+item.meal_type+'","meal_time":"'+item.meal_time+'", "longitude":"'+item.longitude+'", "latitude":"'+item.latitude+'", "user_id":"2"}',
 	  	headers: {'Content-type':'application/json', 'Authorization':'Basic '+Base64.encode(JSON.parse(localStorage.getItem("user")).token+':""')}
 		}).then(function successCallback(response) {
 	    $scope.myrequests.push(response.data);
 	    alert("Request added successfully");
-	    //$scope.requests=response.data.Requests;
 	  	}, function errorCallback(response) {
 	  	alert("ERRORS!");
-	    // called asynchronously if an error occurs
-	    // or server returns response with an error status.
 	  });
 
 	}
-	$scope.edit=function(item)
+	$scope.edit=function(item) // Sends Request data to Edit Form
 	{
 		angular.element(document.getElementById("requestForm")).scope().req=item;
 	}
-	$scope.reset=function(req)
+	$scope.reset=function(req) // Resets Request Form
 	{
 		angular.element(document.getElementById("requestForm")).scope().req={"id":"","meal_type":"","meal_time":"","location_string":""};
 		console.log($scope);
@@ -336,7 +302,7 @@ app.controller('requestController', function($scope, $http, $routeParams, $windo
         req.latitude="";
         req.location_string="";
 	}
-	$scope.update=function(item)
+	$scope.update=function(item) // Updates Request Data
 	{
 		$http({
 	  	method: 'PUT',
@@ -344,16 +310,12 @@ app.controller('requestController', function($scope, $http, $routeParams, $windo
 	 	data: '{"location_string":"'+item.location_string+'","meal_type":"'+item.meal_type+'","meal_time":"'+item.meal_time+'", "longitude":"'+item.longitude+'", "latitude":"'+item.latitude+'", "user_id":"'+JSON.parse(window.localStorage.getItem('user')).id+'"}',
 	  	headers: {'Content-type':'application/json', 'Authorization':'Basic '+Base64.encode(JSON.parse(localStorage.getItem("user")).token+':""')}
 		}).then(function successCallback(response) {
-	    // this callback will be called asynchronously
-	    // when the response is available
 	    alert("Request updated successfully");
 	  	}, function errorCallback(response) {
 	  	alert("ERRORS!");
-	    // called asynchronously if an error occurs
-	    // or server returns response with an error status.
 	  });
 	}
-	$scope.propose=function(item)
+	$scope.propose=function(item) // Function Creates a Proposal based on a request
 	{
 		$http({
 	  	method: 'POST',
@@ -361,17 +323,12 @@ app.controller('requestController', function($scope, $http, $routeParams, $windo
 	  	data: '{"user_proposed_to":"'+item.user_id+'","user_proposed_from":"'+2+'","request_id":"'+item.id+'"}',
 	  	headers: {'Content-type':'application/json', 'Authorization':'Basic '+Base64.encode(JSON.parse(localStorage.getItem("user")).token+':""')}
 		}).then(function successCallback(response) {
-	    // this callback will be called asynchronously
-	    // when the response is available
 	    alert("Proposal Sent!");
-	    console.log(response);
 	  	}, function errorCallback(response) {
 	  	alert("ERRORS!");
-	    // called asynchronously if an error occurs
-	    // or server returns response with an error status.
 	  });
 	}
-	if(window.localStorage && window.localStorage.getItem('user')!==null)
+	if(window.localStorage && window.localStorage.getItem('user')!==null) // If logged in Get Requests for Display
 	$http({
 	  method: 'GET',
 	  url: 'http://localhost:5000/api/v1/requests',
@@ -379,8 +336,6 @@ app.controller('requestController', function($scope, $http, $routeParams, $windo
 	}).then(function successCallback(response) {
 		$scope.myrequests=[];
 		$scope.openrequests=[];
-	    // this callback will be called asynchronously
-	    // when the response is available
 	    for(i=0; i<response.data.Requests.length; i++)
 	    	if(response.data.Requests[i].user_id==JSON.parse(localStorage.getItem("user")).user)
 	    		$scope.myrequests.push(response.data.Requests[i]);
@@ -389,19 +344,16 @@ app.controller('requestController', function($scope, $http, $routeParams, $windo
 
 
 	  }, function errorCallback(response) {
-	  	console.log(response);
 	  	if(response.status===401)
 	  		$window.location.href = '/';
 	  	alert("ERRORS!");
-	    // called asynchronously if an error occurs
-	    // or server returns response with an error status.
 	  });
 	
 });
 
 app.controller('proposalController', function($scope, $http)
 {
-	if(window.localStorage && window.localStorage.getItem('user')!==null)
+	if(window.localStorage && window.localStorage.getItem('user')!==null) // If logged in get Proposals for display
 	$http({
 	  method: 'GET',
 	  url: 'http://localhost:5000/api/v1/proposals',
@@ -417,7 +369,7 @@ app.controller('proposalController', function($scope, $http)
 	  }, function errorCallback(response) {
 	  	console.log("ERRORS!");
 	  });
-	$scope.del=function (item)
+	$scope.del=function (item) // Delete a Proposal
 	{
 		if(window.localStorage && window.localStorage.getItem('user')!==null)
 		{
@@ -430,12 +382,12 @@ app.controller('proposalController', function($scope, $http)
   			$scope.proposalsReceived.splice(index, 1); 
 		  }, function errorCallback(response) 
 		  {
-		  	console.log(response);
+	  		alert("ERRORS!");
 		  });
 		}
 
 	};
-	$scope.accept=function (item)
+	$scope.accept=function (item) // Accept a Proposal made on a User's Reuest
 	{
 		if(window.localStorage && window.localStorage.getItem('user')!==null)
 		$http({
@@ -450,8 +402,6 @@ app.controller('proposalController', function($scope, $http)
 	    alert("Proposal Accepted Successfully!");
 	  	}, function errorCallback(response) {
 	  	alert("ERRORS!");
-	    // called asynchronously if an error occurs
-	    // or server returns response with an error status.
 	  });
 	}
 });
@@ -461,7 +411,7 @@ app.controller('mealDateController', function($scope, $http)
 	$scope.message='mealdate';
 	$scope.timeConverter=timeConverter;
 	
-	if(window.localStorage && window.localStorage.getItem('user')!==null)
+	if(window.localStorage && window.localStorage.getItem('user')!==null) // If logged in get MealDates for display
 	$http({
 	  method: 'GET',
 	  url: 'http://localhost:5000/api/v1/dates',
@@ -473,11 +423,11 @@ app.controller('mealDateController', function($scope, $http)
 	    // called asynchronously if an error occurs
 	    // or server returns response with an error status.
 	  });
-	$scope.edit=function(item)
+	$scope.edit=function(item) // Send MealDate data to edit Form
 	{
 		angular.element(document.getElementById("dateForm")).scope().date=item;
 	}
-	$scope.del=function (item)
+	$scope.del=function (item) // Delete a MealDate
 	{
 		if(window.localStorage && window.localStorage.getItem('user')!==null)
 		{
@@ -490,12 +440,12 @@ app.controller('mealDateController', function($scope, $http)
   			$scope.mealdates.splice(index, 1); 
 		  }, function errorCallback(response) 
 		  {
-		  	console.log(response);
+		  	alert("ERRORS!");
 		  });
 		}
 	};
 
-	$scope.update=function(item)
+	$scope.update=function(item) // Updates a MealDate's info
 	{
 		$http({
 	  	method: 'PUT',
@@ -503,14 +453,9 @@ app.controller('mealDateController', function($scope, $http)
 	 	data: '{"restaurant_name":"'+item.restaurant_name+'","restaurant_address":"'+item.restaurant_address+'","meal_time":"'+item.meal_time+'", "restaurant_picture":"'+item.restaurant_picture+'"}',
 	  	headers: {'Content-type':'application/json', 'Authorization':'Basic '+Base64.encode(JSON.parse(localStorage.getItem("user")).token+':""')}
 		}).then(function successCallback(response) {
-	    // this callback will be called asynchronously
-	    // when the response is available
-
 	    alert("Date updated successfully");
 	  	}, function errorCallback(response) {
 	  	alert("ERRORS!");
-	    // called asynchronously if an error occurs
-	    // or server returns response with an error status.
 	  });
 	}
 });
@@ -523,7 +468,7 @@ app.controller('userController', function($scope, $http, $window)
 	}
 	else
 	{
-		$scope.registerUser=function(user)
+		$scope.registerUser=function(user) // Register a User - Automatically Login
 		{
 		$http({
 		  method: 'POST',
@@ -542,19 +487,10 @@ app.controller('userController', function($scope, $http, $window)
 	    	$window.location.href = '/#/requests';
 	  	}, function errorCallback(response) {
 	  	alert("ERRORS!");
-	    // called asynchronously if an error occurs
-	    // or server returns response with an error status.
 	  });
-
-
 		  }, function errorCallback(response) {
 		  	alert("ERRORS!");
-		    // called asynchronously if an error occurs
-		    // or server returns response with an error status.
 		  });
 		}
 	}
 });
-
-
-

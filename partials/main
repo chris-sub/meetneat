@@ -1,6 +1,0 @@
-<h1>Welcome to Meet n' Eat</h1>
-<div ng-controller="mainController">
-<p>This Angular Js based site consumes a python based Web API to allow you to create Meal Requests, Make Proposals on others requests and automatically get a restaurant recommendation</p>
-<p>But before you get started you have to login by entering your credentials in navbar</p>
-<p>If you don't have an account be sure to <a ng-href="/#/register">Register</a></p>
-</div>

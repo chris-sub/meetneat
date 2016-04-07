@@ -1,7 +1,0 @@
-<div class="form-group">
-  <label for="meal_type">Meal Type:</label>
-  <input type="meal_type" class="form-control" id="meal_type">
-    <label for="meal_time">Meal Time:</label>
-  <input type="meal_time" class="form-control" id="meal_time">
-</div>
-
