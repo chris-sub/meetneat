@@ -1,0 +1,18 @@
+<h1>Proposals</h1>
+<h2>Proposals Received</h2>
+<div ng-controller="proposalController">
+<table class='table table-striped'>
+<thead><tr><th>id</th><th>Requester</th><th>Proposer</th><th>Request id</th><th>Create Date/Delete</th></thead>
+<tbody>
+<tr ng-repeat="proposal in proposalsReceived"><td>{{proposal.id}}</td><td>{{proposal.user_proposed_to}}</td><td>{{proposal.user_proposed_from}}</td><td>{{proposal.request_id}}</td><td><button class='accept-prop' ng-click="accept(proposal)"><span class='glyphicon glyphicon-thumbs-up'></span></button><button class='del-prop' ng-click="del(proposal)"><span class="glyphicon glyphicon-remove"></span></button></td></tr>
+</tbody>
+</table>
+
+<h2>Proposals Made</h2>
+<div ng-controller="proposalController">
+<table class='table table-striped'>
+<thead><tr><th>id</th><th>Requester</th><th>Proposer</th><th>Request id</th></thead>
+<tbody>
+<tr ng-repeat="proposal in proposalsMade"><td>{{proposal.id}}</td><td>{{proposal.user_proposed_to}}</td><td>{{proposal.user_proposed_from}}</td><td>{{proposal.request_id}}</td></tr>
+</tbody>
+</table>
